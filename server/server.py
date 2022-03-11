@@ -1,9 +1,17 @@
 import http.server
+import random
 import socketserver
-from urllib.parse import urlparse, parse_qs
+import string
+import sys
 from http import HTTPStatus
+from urllib.parse import parse_qs, urlparse
 
-PORT = 8000
+PORT = int(sys.argv[1])
+
+
+def random_str(id, size) -> str:
+    random.seed(id[0])
+    return ''.join(random.choices(string.digits+string.ascii_letters, k=int(size[0])))
 
 
 class GETHandler(http.server.SimpleHTTPRequestHandler):
@@ -11,11 +19,12 @@ class GETHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(HTTPStatus.OK)
         self.end_headers()
         self.wfile.write(
-            f'GET request! {parse_qs(urlparse(self.path).query)}'.encode('utf-8'))
+            random_str(**parse_qs(urlparse(self.path).query))
+            .encode('utf-8'))
 
 
 Handler = GETHandler
 
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
-    print("serving at port", PORT)
+    print("Serving at port", PORT)
     httpd.serve_forever()
