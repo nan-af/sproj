@@ -4,8 +4,10 @@ import threading
 
 import zmq
 
+from peer.solo import Solo
 
-class Peer():
+
+class Peer(Solo):
     def __init__(self) -> None:
         # Hacky but I can't figure out how to get IP address from within Mininet
         # Update: there's a Python library `netifaces`
