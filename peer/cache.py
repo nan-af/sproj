@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 
 
-class cache(dict):
+class Cache(dict):
     def __init__(self, limit: Optional[int] = None) -> None:
         self.limit = limit
 

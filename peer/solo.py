@@ -2,9 +2,9 @@ import requests
 from peer import cache
 
 
-class get():
+class Solo():
     def __init__(self) -> None:
-        self.cache = cache.cache()
+        self.cache = cache.Cache()
 
     def get(self, server: str, id: int, size: int):
         if not (data := self.cache.get((server, id, size))):
