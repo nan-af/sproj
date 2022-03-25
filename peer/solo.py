@@ -1,5 +1,6 @@
 import requests
-from peer import cache
+
+import cache
 
 
 class Solo():
