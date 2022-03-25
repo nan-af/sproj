@@ -18,7 +18,7 @@ print(f'Old peers socket bound at {PORT+1}')
 peers = set()
 
 while True:
-    peer_addr = new_peer.recv().decode()
+    peer_addr = tuple(new_peer.recv_json())
     print(f'Received address: {peer_addr}')
 
     peers.add(peer_addr)
