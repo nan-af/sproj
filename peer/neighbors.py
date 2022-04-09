@@ -4,7 +4,7 @@ import threading
 
 import zmq
 
-from solo import Solo
+from .solo import Solo
 
 
 class Peer(Solo):
