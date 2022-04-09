@@ -1,4 +1,5 @@
 import http.server
+import json
 import random
 import socketserver
 import string
@@ -7,6 +8,8 @@ from http import HTTPStatus
 from urllib.parse import parse_qs, urlparse
 
 PORT = int(sys.argv[1])
+
+out = []
 
 
 def random_str(id, size) -> str:
@@ -22,9 +25,18 @@ class GETHandler(http.server.SimpleHTTPRequestHandler):
             random_str(**parse_qs(urlparse(self.path).query))
             .encode('utf-8'))
 
+    def log_message(self, format: str, *args) -> None:
+        out.append("%s - - [%s] %s" %
+                   (self.address_string(),
+                    self.log_date_time_string(),
+                    format % args))
+
 
 Handler = GETHandler
 
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
     print("Serving at port", PORT)
-    httpd.serve_forever()
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print(json.dumps(out))
