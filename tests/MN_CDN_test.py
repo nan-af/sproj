@@ -44,11 +44,6 @@ def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
                 print('Success!', end='')
             print()
 
-    if success:
-        print(f'Tested {len(net.hosts)-1} hosts successfully!')
-    else:
-        print('Some or all hosts returned errors')
-
     net.hosts[0].sendInt()
     server_output = net.hosts[0].waitOutput()
     try:
@@ -56,6 +51,13 @@ def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
     except Exception as e:
         print(repr(e))
         outputs['server'] = server_output
+        success = False
+
+    if success:
+        print(f'Tested {len(net.hosts)-1} hosts successfully!')
+    else:
+        print('Some or all hosts returned errors')
+    outputs['success'] = success
 
     return outputs
 
