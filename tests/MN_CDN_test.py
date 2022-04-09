@@ -31,18 +31,19 @@ def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
         name = str(host)
 
         outputs['clients'][name] = host.waitOutput()
+        print(name, end=' ')
         try:
             outputs['clients'][name] = json.loads(outputs['clients'][name])
         except json.JSONDecodeError:
+            print('Error :(', end='')
             success = False
         else:
-            print(name, end=' ')
             if outputs['clients'][name]['errors']:
                 print('Error :(', end='')
                 success = False
             else:
                 print('Success!', end='')
-            print()
+        print()
 
     net.hosts[0].sendInt()
     server_output = net.hosts[0].waitOutput()
