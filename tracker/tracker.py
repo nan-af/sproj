@@ -19,7 +19,8 @@ peers = set()
 
 while True:
     peer_addr = tuple(new_peer.recv_json())
-    print(f'Received address: {peer_addr}')
+    print(
+        f'Received address: {peer_addr},\tTotal number of peers: {len(peers)}')
 
     peers.add(peer_addr)
 
