@@ -94,7 +94,7 @@ if __name__ == '__main__':
         outfile = Path('/tmp/mn_' +
                        sys.argv[1] + '_' + strftime('%H.%M.%S') + '.json')
 
-    outfile.touch(777)
+    outfile.touch(0o777)
     outfile.write_text(json.dumps(outputs, indent=4))
 
     print('JSON log written to', outfile)
