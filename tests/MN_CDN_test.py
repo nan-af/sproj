@@ -63,7 +63,7 @@ def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
     return outputs
 
 
-def create_test_stop(k, test_args=[]):
+def create_test_stop(k, client_type, test_args=[]):
     lg.setLogLevel('info')
 
     info("*** Initializing Mininet and kernel modules\n")
@@ -86,9 +86,14 @@ def create_test_stop(k, test_args=[]):
 
 
 if __name__ == '__main__':
-    outputs = create_test_stop(int(sys.argv[1])+1, sys.argv[2:5])
+    client_type, num_of_hosts = sys.argv[1:3]
+    num_of_hosts = int(num_of_hosts)
 
-    if len(sys.argv) > 5:
+    outputs = create_test_stop(num_of_hosts+2 if client_type == 'peer' else num_of_hosts+1,
+                               client_type,
+                               sys.argv[3:6])
+
+    if len(sys.argv) > 6:
         outfile = Path(sys.argv[2])
     else:
         outfile = Path('/tmp/mn_' +
