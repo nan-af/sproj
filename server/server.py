@@ -39,4 +39,4 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print(json.dumps(out))
+        print(json.dumps(out, indent=4))

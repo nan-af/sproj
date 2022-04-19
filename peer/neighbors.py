@@ -70,14 +70,14 @@ class Peer(Solo):
             peer = tuple(peer)
             if peer not in self.peers \
                     and peer != (self.IP, self.PORT):
-                print('New peer:', peer)
+                self.out.append('New peer:' + str(peer))
                 new_peer = Connection(peer, self.context)
                 self.peers[peer] = new_peer
 
                 threading.Thread(target=self.listen_peer_pub,
                                  args=(new_peer,)).start()
 
-        print('Peers:', self.peers)
+        self.out.append('Peers:' + str(self.peers))
 
     def listen_peer_pub(self, peer):
         while True:
@@ -89,7 +89,7 @@ class Peer(Solo):
             ):
                 file = tuple(file)
                 self.peer_files[file] = addr
-                print(self.peer_files)
+                self.out.append(self.peer_files)
 
     def listen_peer_rep(self):
         while True:

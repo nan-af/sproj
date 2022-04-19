@@ -5,6 +5,7 @@ from . import cache
 
 class Solo():
     def __init__(self) -> None:
+        self.out=[]
         self.cache = cache.Cache()
 
     def get(self, server: str, id: int, size: int):

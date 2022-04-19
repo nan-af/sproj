@@ -16,14 +16,20 @@ old_peers.bind(f"tcp://*:{PORT+1}")
 print(f'Old peers socket bound at {PORT+1}')
 
 peers = set()
+out = []
 
-while True:
-    peer_addr = tuple(new_peer.recv_json())
-    print(
-        f'Received address: {peer_addr},\tTotal number of peers: {len(peers)}')
+try:
+    while True:
+        peer_addr = tuple(new_peer.recv_json())
 
-    peers.add(peer_addr)
+        peers.add(peer_addr)
 
-    new_peer.send_json(list(peers))
+        out.append(
+            f'Received address: {peer_addr},\tTotal number of peers: {len(peers)}')
 
-    old_peers.send_multipart((b'tracker', json.dumps(list(peers)).encode()))
+        new_peer.send_json(list(peers))
+
+        old_peers.send_multipart(
+            (b'tracker', json.dumps(list(peers)).encode()))
+except KeyboardInterrupt:
+    print(json.dumps(out, indent=4))
