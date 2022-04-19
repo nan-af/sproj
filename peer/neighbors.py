@@ -34,14 +34,14 @@ class Peer(Solo):
         self.sub_tracker()
         self.connect_tracker()
 
-        threading.Thread(target=self.listen_peer_rep).start()
+        threading.Thread(target=self.listen_peer_rep, daemon=True).start()
 
     def sub_tracker(self) -> None:
         print(f"Connecting to tracker's PUB socket at {self.TR_SUB_ADDR}")
         self.tr_sub.connect(self.TR_SUB_ADDR)
         self.tr_sub.setsockopt(zmq.SUBSCRIBE, b'tracker')
 
-        threading.Thread(target=self.listen_tr).start()
+        threading.Thread(target=self.listen_tr, daemon=True).start()
 
     def listen_tr(self) -> None:
         while True:
@@ -75,7 +75,7 @@ class Peer(Solo):
                 self.peers[peer] = new_peer
 
                 threading.Thread(target=self.listen_peer_pub,
-                                 args=(new_peer,)).start()
+                                 args=(new_peer,), daemon=True).start()
 
         self.out.append('Peers:' + str(self.peers))
 
