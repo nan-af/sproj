@@ -5,16 +5,23 @@ import sys
 sys.path.append('./')
 from peer import solo   # noqa
 
-
+server_addr, distinct_files, file_sizes, requests = sys.argv[1:5]
 host = solo.Solo()
+
+distinct_files = int(distinct_files)
+file_sizes = int(file_sizes)
+requests = int(requests)
+
 out = {}
-out['TOTAL'] = int(sys.argv[3])
+out['total'] = requests
 out['success'] = 0
 out['errors'] = {}
 
-for i in range(out['TOTAL']):
+for i in range(requests):
     try:
-        host.get(sys.argv[1], randint(1, int(sys.argv[2])), int(sys.argv[4]))
+        host.get(server_addr,
+                 randint(1, distinct_files),
+                 file_sizes)
     except Exception as e:
         out['errors'][i] = repr(e)
     else:
