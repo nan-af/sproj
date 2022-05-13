@@ -176,6 +176,13 @@ def create_test_stop(k, client_type, test_args=[]):
     else:
         outputs = soloTest(network, *test_args)
 
+    info("*** Collecting stats\n")
+    # for host in network.hosts:
+    #     outputs['clients'][str(host)]['stats'] = json.loads(
+    #         host.cmd('ip -stats -json link'))
+    outputs['stats'] = json.loads(
+        network.switches[0].cmd('ip -stats -json link'))
+
     info("*** Stopping network\n")
     network.stop()
 
