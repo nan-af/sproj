@@ -94,7 +94,7 @@ if __name__ == '__main__':
                                sys.argv[3:6])
 
     if len(sys.argv) > 6:
-        outfile = Path(sys.argv[2])
+        outfile = Path(sys.argv[6])
     else:
         outfile = Path('/tmp/mn_' +
                        sys.argv[1] + '_' + strftime('%H.%M.%S') + '.json')
