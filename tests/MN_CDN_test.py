@@ -65,6 +65,98 @@ def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
     return outputs
 
 
+def peerTest(net, distinct_files=10, requests=100, file_sizes=10):
+    server = net.hosts[0]
+    server_ip = server.IP()
+    # IANA ephemeral ports range. Also RFC 6335.
+    server_port = randint(49152, 65535)
+
+    tracker = net.hosts[1]
+    tracker_ip = tracker.IP()
+    # Subtracting 1 from the IANA range because tracker needs two ports
+    tracker_port = randint(49152, 65534)
+
+    server.sendCmd(f'pipenv run python server/server.py {server_port}')
+    server.waitReadable()
+    print(server.readline())
+
+    tracker.sendCmd(
+        f'pipenv run python tracker/tracker.py {tracker_port}')
+    tracker.waitReadable()
+    print(tracker.readline())
+    tracker.waitReadable()
+    print(tracker.readline())
+
+    clients = net.hosts[2:]
+
+    for host in clients:
+        host.sendCmd(
+            'pipenv run python tests/test_neighbors.py '
+            + f'{host.IP()} {randint(49152, 65535)} {tracker_ip} {tracker_port} '
+            + f'"http://{server_ip}:{server_port}" {distinct_files} {file_sizes}')
+        host.waitReadable()
+        print(host.readline())
+        host.waitReadable()
+        print(host.readline())
+
+    outputs = {}
+    outputs['clients'] = {}
+    # outputs['clients']['files'] = {}
+
+    for i in range(int(requests)):
+        # outputs['clients']['files'][i] = []
+        for host in clients:
+            host.write('\n')
+            name = str(host)
+            sleep(0.005)
+            host.waitReadable()
+            # outputs['clients']['files'][i].append((name, host.readline()))
+            host.readline()
+
+    for host in net.hosts:
+        host.sendInt()
+
+    success = True
+
+    for host in net.hosts[:2]:
+        name = str(host)
+        # host.waitOutput()
+        # while not outputs['clients'][name]:
+        try:
+            outputs['clients'][name] = host.waitOutput(verbose=True)
+        except KeyboardInterrupt:
+            # os.killpg(host.lastPid, signal.SIGHUP)
+            try:
+                outputs['clients'][name] = host.read(2**30)
+                print(outputs['clients'][name])
+            except KeyboardInterrupt:
+                outputs['clients'][name] = ''
+
+        print(name, end=' ')
+        try:
+            outputs['clients'][name] = json.loads(outputs['clients'][name])
+        except json.JSONDecodeError:
+            print('Error :(')
+            success = False
+        else:
+            if outputs['clients'][name]['errors']:
+                print('Error :(')
+                success = False
+            else:
+                print('Success!')
+        # print(f'{name} complete')
+    # for host in clients:
+    #     outputs['clients'][name] = {}
+
+    if success:
+        print(f'Tested {len(clients)} hosts successfully!')
+    else:
+        print('Some or all hosts returned errors')
+    outputs['success'] = success
+
+    return outputs
+
+
 def create_test_stop(k, client_type, test_args=[]):
     lg.setLogLevel('info')
 
@@ -78,8 +170,11 @@ def create_test_stop(k, client_type, test_args=[]):
     info("*** Starting network\n")
     network.start()
 
-    info("*** Running CDN test\n")
-    outputs = soloTest(network, *test_args)
+    info(f"*** Running CDN {client_type} test\n")
+    if client_type == 'peer':
+        outputs = peerTest(network, *test_args)
+    else:
+        outputs = soloTest(network, *test_args)
 
     info("*** Stopping network\n")
     network.stop()
