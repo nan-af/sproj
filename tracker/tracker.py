@@ -16,7 +16,9 @@ old_peers.bind(f"tcp://*:{PORT+1}")
 print(f'Old peers socket bound at {PORT+1}')
 
 peers = set()
-out = []
+out = {}
+out['log'] = []
+out['errors'] = []
 
 try:
     while True:
@@ -24,7 +26,7 @@ try:
 
         peers.add(peer_addr)
 
-        out.append(
+        out['log'].append(
             f'Received address: {peer_addr},\tTotal number of peers: {len(peers)}')
 
         new_peer.send_json(list(peers))
@@ -32,4 +34,5 @@ try:
         old_peers.send_multipart(
             (b'tracker', json.dumps(list(peers)).encode()))
 except KeyboardInterrupt:
+    out['count'] = len(out['log'])
     print(json.dumps(out, indent=4))

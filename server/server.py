@@ -9,7 +9,9 @@ from urllib.parse import parse_qs, urlparse
 
 PORT = int(sys.argv[1])
 
-out = []
+out = {}
+out['log'] = []
+out['errors'] = []
 
 
 def random_str(id, size) -> str:
@@ -26,10 +28,10 @@ class GETHandler(http.server.SimpleHTTPRequestHandler):
             .encode('utf-8'))
 
     def log_message(self, format: str, *args) -> None:
-        out.append("%s - - [%s] %s" %
-                   (self.address_string(),
-                    self.log_date_time_string(),
-                    format % args))
+        out['log'].append("%s - - [%s] %s" %
+                          (self.address_string(),
+                           self.log_date_time_string(),
+                           format % args))
 
 
 Handler = GETHandler
@@ -39,4 +41,5 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
+        out['count'] = len(out['log'])
         print(json.dumps(out, indent=4))
