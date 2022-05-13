@@ -12,11 +12,13 @@ from mininet.topo import SingleSwitchTopo
 
 
 def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
-    server_ip = net.hosts[0].IP()
-    server_port = net.hosts[0].newPort()
+    server = net.hosts[0]
+    server_ip = server.IP()
+    # IANA ephemeral ports range. Also RFC 6335.
+    server_port = randint(49152, 65535)
 
-    net.hosts[0].sendCmd(f'pipenv run python server/server.py {server_port}')
-    net.hosts[0].readline()
+    server.sendCmd(f'pipenv run python server/server.py {server_port}')
+    server.readline()
 
     for host in net.hosts[1:]:
         host.sendCmd(
@@ -45,8 +47,8 @@ def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
                 print('Success!', end='')
         print()
 
-    net.hosts[0].sendInt()
-    server_output = net.hosts[0].waitOutput()
+    server.sendInt()
+    server_output = server.waitOutput()
     try:
         outputs['server'] = json.loads(server_output)
     except Exception as e:
