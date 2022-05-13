@@ -183,8 +183,8 @@ def create_test_stop(k, client_type, test_args=[]):
     outputs['stats'] = json.loads(
         network.switches[0].cmd('ip -stats -json link'))
 
-    info("*** Stopping network\n")
-    network.stop()
+    # info("*** Stopping network\n")
+    # network.stop()
 
     return outputs
 
