@@ -20,7 +20,7 @@ def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
 
     for host in net.hosts[1:]:
         host.sendCmd(
-            f'pipenv run python tests/test_solo.py "http://{server_ip}:{server_port}" {distinct_files} {requests} {file_sizes}')
+            f'pipenv run python tests/test_solo.py "http://{server_ip}:{server_port}" {distinct_files} {file_sizes} {requests}')
 
     outputs = {}
     outputs['clients'] = {}
