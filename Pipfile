@@ -6,9 +6,11 @@ name = "pypi"
 [packages]
 requests = "*"
 pyzmq = "*"
+matplotlib = "*"
 
 [dev-packages]
 autopep8 = "*"
+ipykernel = "*"
 
 [requires]
 python_version = "3.10"
