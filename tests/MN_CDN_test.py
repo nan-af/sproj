@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import json
+from random import randint
 import sys
 
 from pathlib import Path
-from time import strftime
+from time import sleep, strftime
 from mininet.log import lg, info
 from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch
