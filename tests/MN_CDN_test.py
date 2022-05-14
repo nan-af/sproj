@@ -2,6 +2,7 @@
 
 import json
 from random import randint
+from signal import SIGALRM, alarm, signal
 import sys
 
 from pathlib import Path
@@ -10,6 +11,14 @@ from mininet.log import lg, info
 from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch
 from mininet.topo import Topo, SingleSwitchTopo
+
+
+def timeout(signum, frame):
+    print('Timeout!')
+    raise KeyboardInterrupt
+
+
+signal(SIGALRM, timeout)
 
 
 class nHopTopo(Topo):
@@ -147,6 +156,7 @@ def peerTest(net, distinct_files=10, requests=100, file_sizes=10):
         # host.waitOutput()
         # while not outputs['clients'][name]:
         try:
+            alarm(20)
             outputs['clients'][name] = host.waitOutput(verbose=True)
         except KeyboardInterrupt:
             # os.killpg(host.lastPid, signal.SIGHUP)
@@ -155,6 +165,8 @@ def peerTest(net, distinct_files=10, requests=100, file_sizes=10):
                 print(outputs['clients'][name])
             except KeyboardInterrupt:
                 outputs['clients'][name] = ''
+        finally:
+            alarm(0)
 
         print(name, end=' ')
         try:
