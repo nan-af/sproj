@@ -110,15 +110,19 @@ def peerTest(net, distinct_files=10, requests=100, file_sizes=10):
     tracker_port = randint(49152, 65534)
 
     server.sendCmd(f'pipenv run python server/server.py {server_port}')
-    server.waitReadable()
-    print(server.readline())
+    # server.waitReadable()
+    while not (lineout := server.readline()):
+        pass
+    print(lineout)
 
     tracker.sendCmd(
         f'pipenv run python tracker/tracker.py {tracker_port}')
-    tracker.waitReadable()
-    print(tracker.readline())
-    tracker.waitReadable()
-    print(tracker.readline())
+    while not (lineout := tracker.readline()):
+        pass
+    print(lineout)
+    while not (lineout := tracker.readline()):
+        pass
+    print(lineout)
 
     clients = net.hosts[2:]
 
@@ -127,10 +131,12 @@ def peerTest(net, distinct_files=10, requests=100, file_sizes=10):
             'pipenv run python tests/test_neighbors.py '
             + f'{host.IP()} {randint(49152, 65535)} {tracker_ip} {tracker_port} '
             + f'"http://{server_ip}:{server_port}" {distinct_files} {file_sizes}')
-        host.waitReadable()
-        print(host.readline())
-        host.waitReadable()
-        print(host.readline())
+        while not (lineout := host.readline()):
+            pass
+        print(lineout)
+        while not (lineout := host.readline()):
+            pass
+        print(lineout)
 
     outputs = {}
     outputs['clients'] = {}
@@ -141,10 +147,11 @@ def peerTest(net, distinct_files=10, requests=100, file_sizes=10):
         for host in clients:
             host.write('\n')
             name = str(host)
-            sleep(0.005)
-            host.waitReadable()
+            sleep(0.020)
+            # host.waitReadable()
             # outputs['clients']['files'][i].append((name, host.readline()))
-            host.readline()
+            while not host.readline():
+                pass
 
     for host in net.hosts:
         host.sendInt()
