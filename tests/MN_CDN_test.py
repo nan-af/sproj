@@ -5,6 +5,8 @@ from random import randint
 from signal import SIGALRM, alarm, signal
 import sys
 
+sys.path.append('/usr/lib/python3.10/site-packages')  # noqa
+
 from pathlib import Path
 from time import sleep, strftime
 from mininet.log import lg, info
