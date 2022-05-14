@@ -9,7 +9,30 @@ from time import sleep, strftime
 from mininet.log import lg, info
 from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch
-from mininet.topo import SingleSwitchTopo
+from mininet.topo import Topo, SingleSwitchTopo
+
+
+class nHopTopo(Topo):
+    "Two clusters of sizes a and b, separated by n hops"
+
+    def build(self, k=None, n=20, a=2, b=2):
+        if k:
+            b = k - a
+
+        # n-1 switches needed for n hops
+        switches = [self.addSwitch(f's{i+1}') for i in range(n-1)]
+
+        for i in range(len(switches)-1):
+            self.addLink(switches[i], switches[i+1])
+
+        for i in range(a):
+            host = self.addHost(f'h{i+1}')
+            self.addLink(host, switches[0])
+
+        for i in range(b):
+            # continue numbering from where `a` left off
+            host = self.addHost(f'h{i+a+1}')
+            self.addLink(host, switches[-1])
 
 
 def soloTest(net, distinct_files=10, requests=100, file_sizes=10):
@@ -165,7 +188,7 @@ def create_test_stop(k, client_type, test_args=[]):
     OVSKernelSwitch.setup()
 
     info("*** Creating network\n")
-    network = Mininet(SingleSwitchTopo(k=k), switch=OVSKernelSwitch,
+    network = Mininet(nHopTopo(k=k, a=1 if client_type == 'solo' else 2), switch=OVSKernelSwitch,
                       waitConnected=True)
 
     info("*** Starting network\n")
@@ -177,12 +200,12 @@ def create_test_stop(k, client_type, test_args=[]):
     else:
         outputs = soloTest(network, *test_args)
 
+    outputs['stats'] = {}
     info("*** Collecting stats\n")
-    # for host in network.hosts:
     #     outputs['clients'][str(host)]['stats'] = json.loads(
     #         host.cmd('ip -stats -json link'))
-    outputs['stats'] = json.loads(
-        network.switches[0].cmd('ip -stats -json link'))
+    for s in network.switches:
+        outputs['stats'][str(s)] = json.loads(s.cmd('ip -stats -json link'))
 
     # info("*** Stopping network\n")
     # network.stop()
