@@ -7,6 +7,9 @@ name = "pypi"
 requests = "*"
 pyzmq = "*"
 matplotlib = "*"
+ipympl = "*"
+scipy = "*"
+numpy = "*"
 
 [dev-packages]
 autopep8 = "*"
