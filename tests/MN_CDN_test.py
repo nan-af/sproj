@@ -211,6 +211,8 @@ def create_test_stop(k, client_type, test_args=[]):
     info("*** Creating network\n")
     network = Mininet(nHopTopo(k=k, a=1 if client_type == 'solo' else 2), switch=OVSKernelSwitch,
                       waitConnected=True)
+    # network = Mininet(SingleSwitchTopo(k=k), switch=OVSKernelSwitch,
+    #                   waitConnected=True)
 
     info("*** Starting network\n")
     network.start()
